@@ -10,18 +10,16 @@
     <link rel="stylesheet" href="/styles/layout.css">
     <link rel="stylesheet" href="/styles/modules.css">
     <link rel="icon" type="image/x-icon" href="https://avatars2.githubusercontent.com/u/18607604?v=3&s=200">
-    <!-- TODO: Setup a template for each row of the Author Stats section of this page: -->
+    <!-- DONE: Setup a template for each row of the Author Stats section of this page: -->
 
     <script id="authors-template" type="text/x-handlebars-template">
-      <article class="clearfix" data-author="{{author}}" data-category="{{category}}">
+      <article class="clearfix" data-author="{{author}}" >
         <header>
-          <h1>{{title}}</h1>
-          <div class="byline">
-            By <address><a href="{{authorUrl}}">{{author}}</a></address>
-            {{publishStatus}}
-          </div>
+          <h3>{{author}}</h3>
         </header>
-        <section class="article-body">{{{body}}}</section>
+      <section class="article-body">
+              The author {{author}}, has writen {{numWords}}.
+      </section>
       </article>
     </script>
 

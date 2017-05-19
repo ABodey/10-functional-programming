@@ -1,11 +1,12 @@
 'use strict';
 
-// TODO: Wrap the entire contents of this file in an IIFE.
+// DONE: Wrap the entire contents of this file in an IIFE.
 // Pass in to the IIFE a module, upon which objects can be attached for later access.
 var articleView = {};
 
-articleView.populateFilters = function() {
-  $('article').each(function() {
+(function(module){
+articleView.populateFilters = function () {
+  $('article').each(function () {
     if (!$(this).hasClass('template')) {
       var val = $(this).find('address a').text();
       var optionTag = `<option value="${val}">${val}</option>`;
@@ -22,8 +23,8 @@ articleView.populateFilters = function() {
   });
 };
 
-articleView.handleAuthorFilter = function() {
-  $('#author-filter').on('change', function() {
+articleView.handleAuthorFilter = function () {
+  $('#author-filter').on('change', function () {
     if ($(this).val()) {
       $('article').hide();
       $(`article[data-author="${$(this).val()}"]`).fadeIn();
@@ -35,8 +36,8 @@ articleView.handleAuthorFilter = function() {
   });
 };
 
-articleView.handleCategoryFilter = function() {
-  $('#category-filter').on('change', function() {
+articleView.handleCategoryFilter = function () {
+  $('#category-filter').on('change', function () {
     if ($(this).val()) {
       $('article').hide();
       $(`article[data-category="${$(this).val()}"]`).fadeIn();
@@ -48,8 +49,8 @@ articleView.handleCategoryFilter = function() {
   });
 };
 
-articleView.handleMainNav = function() {
-  $('.main-nav').on('click', '.tab', function() {
+articleView.handleMainNav = function () {
+  $('.main-nav').on('click', '.tab', function () {
     $('.tab-content').hide();
     $(`#${$(this).data('content')}`).fadeIn();
   });
@@ -57,27 +58,27 @@ articleView.handleMainNav = function() {
   $('.main-nav .tab:first').click();
 };
 
-articleView.setTeasers = function() {
+articleView.setTeasers = function () {
   $('.article-body *:nth-of-type(n+2)').hide();
 
-  $('#articles').on('click', 'a.read-on', function(e) {
+  $('#articles').on('click', 'a.read-on', function (e) {
     e.preventDefault();
     $(this).parent().find('*').fadeIn();
     $(this).hide();
   });
 };
 
-articleView.initNewArticlePage = function() {
+articleView.initNewArticlePage = function () {
   $('.tab-content').show();
   $('#export-field').hide();
-  $('#article-json').on('focus', function(){
+  $('#article-json').on('focus', function () {
     this.select();
   });
 
   $('#new-form').on('change', 'input, textarea', articleView.create);
 };
 
-articleView.create = function() {
+articleView.create = function () {
   var article;
   $('#articles').empty();
 
@@ -96,7 +97,7 @@ articleView.create = function() {
   $('#article-json').val(`${JSON.stringify(article)},`);
 };
 
-articleView.initIndexPage = function() {
+articleView.initIndexPage = function () {
   Article.all.forEach(a => $('#articles').append(a.toHtml()));
 
   articleView.populateFilters();
@@ -106,8 +107,14 @@ articleView.initIndexPage = function() {
   articleView.setTeasers();
 };
 
-articleView.initAdminPage = function() {
+articleView.initAdminPage = function () {
+  console.log('initAdminPage');
   // TODO: Call the Handlebars `.compile` function, which will return a function for you to use where needed.
+
+  var statTemplate = Handlebars.compile($('#authors-template').text());
+
+  this.author = this.author;
+  this.numwords = this.Article.numwordsByAuthor();
 
   // REVIEW: We use `forEach` here because we are relying on the side-effects of the callback function:
   // appending to the DOM.
@@ -117,4 +124,7 @@ articleView.initAdminPage = function() {
   // REVIEW: Simply write the correct values to the page:
   $('#blog-stats .articles').text(Article.all.length);
   $('#blog-stats .words').text(Article.numWordsAll());
+
+  return statTemplate(this);
 };
+})(window);
