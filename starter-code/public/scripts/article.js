@@ -8,8 +8,8 @@ function Article(opts) {
   // REVIEW: Lets review what's actually happening here, and check out some new syntax!!
   Object.keys(opts).forEach(e => this[e] = opts[e]);
 }
-(function (module) {
 
+(function (module) {
   Article.all = [];
 
   Article.prototype.toHtml = function () {
@@ -23,7 +23,7 @@ function Article(opts) {
   };
 
   Article.loadAll = rows => {
-    rows.sort((a, b) => (new Date(b.publishedOn)) - (new Date(a.publishedOn)))
+    Article.all = rows.sort((a, b) => (new Date(b.publishedOn)) - (new Date(a.publishedOn)))
       .map(function (ele) { return new Article(ele) });
     console.log('article.loadall');
   };
@@ -42,22 +42,18 @@ function Article(opts) {
       results => {
         Article.loadAll(results);
         callback();
+        console.log('fetchdata');
       }
       )
-    console.log('fetchdata');
   };
 
   // TODO: Chain together a `map` and a `reduce` call to get a rough count of all words in all articles.
   Article.numWordsAll = () => {
-    return Article.all.map(
-      function (a) {
-        return a.body.split(' ').length;
-      }
-    ).reduce(
-      function (acc, num) {
-        return acc + num;
-      }, 0
-      );
+    return Article.all.map(function (a) {
+      return a.body.split(' ').length;
+    }).reduce(function (acc, num) {
+      return acc + num;
+    }, 0)
   };
 
   // TODO: Chain together a `map` and a `reduce` call to produce an array of unique author names.
@@ -65,72 +61,70 @@ function Article(opts) {
     return Article.all.map(function (a) {
       return a.author;
     }).reduce(function (uniqueAuthurs, ele) {
-      if (uniqueAuthurs.indexOf(ele), 0) uniqueAuthurs.push(ele);
+      if (uniqueAuthurs.indexOf(ele)< 0) uniqueAuthurs.push(ele);
       return uniqueAuthurs;
     }, []);
   };
 
-//   Article.numWordsByAuthor = () => {
-//     return Article.allAuthors().map(author => {
-//       // TODO: Transform each author string into an object with properties for
-//       // the author's name, as well as the total number of words across all articles
-//       // written by the specified author.
-//       return Article.all.map(
-//         function (a) {
-//           var words = a.body.split;
-//         } return {
-//           author: a.author,
-//           count: words.length
-//         }
-//   ).reduce(
-//       function (acc, num) {
-//         return acc + num;
-//       }, 0
-//       );
+  Article.numWordsByAuthor = () => {
+    return Article.allAuthors().map(author => {
+      // TODO: Transform each author string into an object with properties for
+      // the author's name, as well as the total number of words across all articles
+      // written by the specified author.
+      return {
+        authorName: author,
+        totalWords:
+        Article.all.filter(function (article) {
+          return article.author === author;
+        }).map(function (a) {
+          return a.body.split(' ').length;
+        }).reduce(function (acc, num) {
+          return acc + num;
+        }, 0)
+      }
+    })
+  };
 
-//   })
-// };
+  Article.truncateTable = callback => {
+    $.ajax({
+      url: '/articles',
+      method: 'DELETE',
+    })
+      .then(console.log) // REVIEW: Check out this clean syntax for just passing 'assumend' data into a named function!
+      .then(callback);
+  };
 
-Article.truncateTable = callback => {
-  $.ajax({
-    url: '/articles',
-    method: 'DELETE',
-  })
-    .then(console.log) // REVIEW: Check out this clean syntax for just passing 'assumend' data into a named function!
-    .then(callback);
-};
+  Article.prototype.insertRecord = function (callback) {
+    // REVIEW: Why can't we use an arrow function here for .insertRecord()??
+    $.post('/articles', { author: this.author, authorUrl: this.authorUrl, body: this.body, category: this.category, publishedOn: this.publishedOn, title: this.title })
+      .then(console.log)
+      .then(callback);
+  };
 
-Article.prototype.insertRecord = function (callback) {
-  // REVIEW: Why can't we use an arrow function here for .insertRecord()??
-  $.post('/articles', { author: this.author, authorUrl: this.authorUrl, body: this.body, category: this.category, publishedOn: this.publishedOn, title: this.title })
-    .then(console.log)
-    .then(callback);
-};
+  Article.prototype.deleteRecord = function (callback) {
+    $.ajax({
+      url: `/articles/${this.article_id}`,
+      method: 'DELETE'
+    })
+      .then(console.log)
+      .then(callback);
+  };
 
-Article.prototype.deleteRecord = function (callback) {
-  $.ajax({
-    url: `/articles/${this.article_id}`,
-    method: 'DELETE'
-  })
-    .then(console.log)
-    .then(callback);
-};
-
-Article.prototype.updateRecord = function (callback) {
-  $.ajax({
-    url: `/articles/${this.article_id}`,
-    method: 'PUT',
-    data: {
-      author: this.author,
-      authorUrl: this.authorUrl,
-      body: this.body,
-      category: this.category,
-      publishedOn: this.publishedOn,
-      title: this.title,
-      author_id: this.author_id
-    }
-  })
-    .then(console.log)
-    .then(callback);
-};
+  Article.prototype.updateRecord = function (callback) {
+    $.ajax({
+      url: `/articles/${this.article_id}`,
+      method: 'PUT',
+      data: {
+        author: this.author,
+        authorUrl: this.authorUrl,
+        body: this.body,
+        category: this.category,
+        publishedOn: this.publishedOn,
+        title: this.title,
+        author_id: this.author_id
+      }
+    })
+      .then(console.log)
+      .then(callback);
+  };
 })(window);

@@ -11,18 +11,12 @@
     <link rel="stylesheet" href="/styles/modules.css">
     <link rel="icon" type="image/x-icon" href="https://avatars2.githubusercontent.com/u/18607604?v=3&s=200">
     <!-- DONE: Setup a template for each row of the Author Stats section of this page: -->
-
-    <script id="authors-template" type="text/x-handlebars-template">
-      <article class="clearfix" data-author="{{author}}" >
-        <header>
-          <h3>{{author}}</h3>
-        </header>
-      <section class="article-body">
-              The author {{author}}, has writen {{numWords}}.
-      </section>
-      </article>
+    <script id="author-stats-template" type="text/x-handlebars-template">
+      <li>{{ authorName }}</li>
+      <ul>
+        <li>{{ totalWords }}</li>
+      </ul>
     </script>
-
   </head>
   <body>
     <header class="site-header clearfix">
